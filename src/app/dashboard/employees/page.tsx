@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import WebAdminLayout from '@/components/layout/WebAdminLayout';
 import HRCard from '@/components/ui/HRCard';
 import HRBadge from '@/components/ui/HRBadge';
-import { Users, Plus, UserPlus, Copy, CheckCircle, Search, Mail, Trash2 } from 'lucide-react';
+import { Users, Plus, UserPlus, Copy, CheckCircle, Search, Mail, Trash2, Send, MessageSquare } from 'lucide-react';
 
 interface Employee {
     id: string;
@@ -28,6 +28,12 @@ export default function EmployeesPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [copySuccess, setCopySuccess] = useState<string | null>(null);
+
+    // Messaging state
+    const [showMessageModal, setShowMessageModal] = useState(false);
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+    const [messageText, setMessageText] = useState('');
+    const [isSending, setIsSending] = useState(false);
 
     useEffect(() => {
         fetchEmployees();
@@ -92,6 +98,36 @@ export default function EmployeesPage() {
         } catch (err) {
             console.error(err);
             alert('An error occurred');
+        }
+    };
+
+    const handleSendMessage = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedEmployee?.telegram_id || !messageText.trim()) return;
+
+        setIsSending(true);
+        try {
+            const res = await fetch('/api/employees/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    telegram_id: selectedEmployee.telegram_id,
+                    message: messageText
+                }),
+            });
+
+            if (res.ok) {
+                setShowMessageModal(false);
+                setMessageText('');
+                alert('Message sent successfully!');
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to send message');
+            }
+        } catch (err) {
+            alert('Failed to connect to messaging service');
+        } finally {
+            setIsSending(false);
         }
     };
 
@@ -220,7 +256,19 @@ export default function EmployeesPage() {
                                                             </button>
                                                         </div>
                                                     )}
-                                                    {!isLinked && (
+                                                    {isLinked && (
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedEmployee(emp);
+                                                                setShowMessageModal(true);
+                                                            }}
+                                                            className="p-2 text-gray-300 hover:text-primary hover:bg-tint-blue rounded-hr transition-premium"
+                                                            title="Send Telegram Message"
+                                                        >
+                                                            <Send size={16} />
+                                                        </button>
+                                                    )}
+                                                    {!isLinked && emp.role !== 'admin' && (
                                                         <button
                                                             onClick={() => handleDeleteEmployee(emp.id)}
                                                             className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-hr transition-premium"
@@ -306,6 +354,62 @@ export default function EmployeesPage() {
                                         className="flex-2 bg-primary text-white font-black px-8 h-10 rounded-[6px] hover:shadow-lg transition-all disabled:opacity-40 text-[10px] uppercase tracking-[0.2em]"
                                     >
                                         {isSubmitting ? 'GENERATING...' : 'GENERATE INVITE'}
+                                    </button>
+                                </div>
+                            </form>
+                        </HRCard>
+                    </div>
+                )}
+
+                {/* Message Modal */}
+                {showMessageModal && selectedEmployee && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+                        <HRCard className="max-w-md w-full animate-premium-in shadow-hr-soft" padding={false}>
+                            <div className="p-6 border-b border-border-main bg-tint-blue/30 rounded-t-hr">
+                                <h2 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+                                    <MessageSquare className="text-primary" size={20} />
+                                    Text {selectedEmployee.full_name}
+                                </h2>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Direct via Telegram Bot</p>
+                            </div>
+                            <form onSubmit={handleSendMessage} className="p-6 space-y-4">
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between ml-1">
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Message Content</label>
+                                        <span className="text-[9px] font-bold text-primary bg-tint-blue px-2 py-0.5 rounded-full">Encrypted Link</span>
+                                    </div>
+                                    <textarea
+                                        required
+                                        rows={4}
+                                        className="hr-input w-full resize-none py-3"
+                                        placeholder="Type your message here..."
+                                        value={messageText}
+                                        onChange={(e) => setMessageText(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="flex items-center gap-3 pt-4">
+                                    <button
+                                        type="button"
+                                        disabled={isSending}
+                                        onClick={() => setShowMessageModal(false)}
+                                        className="flex-1 h-11 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-colors"
+                                    >
+                                        Dismiss
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSending || !messageText.trim()}
+                                        className="flex-2 bg-primary text-white font-black px-8 h-11 rounded-hr hover:shadow-lg shadow-primary/20 transition-all disabled:opacity-40 text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-2"
+                                    >
+                                        {isSending ? (
+                                            'SENDING...'
+                                        ) : (
+                                            <>
+                                                <Send size={14} />
+                                                SEND TEXT
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </form>
