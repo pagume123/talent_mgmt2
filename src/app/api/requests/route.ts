@@ -148,8 +148,9 @@ export async function PATCH(req: Request) {
 
         // Verify admin/supervisor permissions
         const { data: profile } = await supabase
-            .from('get_my_profile()')
-            .select('*')
+            .from('profiles')
+            .select('company_id, role')
+            .eq('user_id', user.id)
             .single();
 
         if (!profile || (profile.role !== 'admin' && profile.role !== 'supervisor')) {

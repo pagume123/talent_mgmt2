@@ -83,8 +83,9 @@ export async function GET(req: Request) {
 
         // Get admin context
         const { data: adminProfile } = await supabase
-            .from('get_my_profile()')
-            .select('*')
+            .from('profiles')
+            .select('company_id, role')
+            .eq('user_id', user.id)
             .single();
 
         if (adminProfile?.role !== 'admin') {
