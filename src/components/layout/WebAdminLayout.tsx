@@ -31,13 +31,18 @@ export default function WebAdminLayout({ children }: { children: React.ReactNode
     return (
         <div className="flex min-h-screen bg-background text-foreground font-sans">
             {/* Sidebar */}
-            <aside className="w-64 bg-surface border-r border-border-main fixed h-full z-20">
-                <div className="p-6 border-b border-border-main flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary rounded-[6px]" />
-                    <span className="font-bold text-lg tracking-tight">Talent HR</span>
+            <aside className="w-68 bg-surface border-r border-border-main fixed h-full z-20 flex flex-col">
+                <div className="p-8 pb-10 flex items-center gap-3">
+                    <div className="w-9 h-9 bg-primary rounded-hr shadow-hr-md flex items-center justify-center transform -rotate-3">
+                        <div className="w-3 h-3 bg-white rounded-full opacity-30" />
+                    </div>
+                    <div>
+                        <span className="font-black text-lg tracking-tight block leading-none">Talent</span>
+                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Management</span>
+                    </div>
                 </div>
 
-                <nav className="p-4 space-y-1">
+                <nav className="flex-1 px-4 space-y-1.5">
                     {NAV_ITEMS.map((item) => {
                         const isActive = pathname === item.path;
                         const Icon = item.icon;
@@ -45,47 +50,58 @@ export default function WebAdminLayout({ children }: { children: React.ReactNode
                             <Link
                                 key={item.label}
                                 href={item.path}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-[6px] text-sm font-medium transition-all ${isActive
-                                    ? 'bg-tint-blue text-primary border border-primary/20'
-                                    : 'text-gray-500 hover:bg-secondary hover:text-gray-900 border border-transparent'
+                                className={`flex items-center gap-3 px-4 py-3.5 rounded-hr text-[12px] font-black uppercase tracking-widest transition-premium group ${isActive
+                                    ? 'bg-tint-blue text-primary border border-primary/10 shadow-hr-sm'
+                                    : 'text-gray-400 hover:bg-secondary hover:text-gray-900 border border-transparent'
                                     }`}
                             >
-                                <Icon size={20} />
+                                <Icon size={18} className={`transition-transform duration-200 group-hover:scale-110 ${isActive ? 'text-primary' : ''}`} />
                                 {item.label}
                             </Link>
                         );
                     })}
                 </nav>
+
+                <div className="p-4 border-t border-border-main m-4 bg-secondary rounded-hr">
+                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Workspace context</div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                        <span className="text-[11px] font-bold text-gray-600 tracking-tight">System Live</span>
+                    </div>
+                </div>
             </aside>
 
             {/* Main Content Area */}
-            <div className="flex-1 ml-64 flex flex-col min-h-screen">
+            <div className="flex-1 ml-68 flex flex-col min-h-screen">
                 {/* Header */}
-                <header className="h-16 bg-surface border-b border-border-main flex items-center justify-between px-8 sticky top-0 z-10">
+                <header className="h-20 glass-effect flex items-center justify-between px-10 sticky top-0 z-30">
                     <div className="flex items-center flex-1 h-full">
-                        <div className="flex items-center gap-3 text-gray-400 max-w-md w-full">
-                            <Search size={18} />
+                        <div className="flex items-center gap-3 text-gray-400 max-w-sm w-full bg-secondary px-4 py-2.5 rounded-hr border border-border-main/50 transition-premium focus-within:border-primary/30 focus-within:bg-white text-xs">
+                            <Search size={16} />
                             <input
                                 type="text"
-                                placeholder="Search anything..."
-                                className="bg-transparent border-none focus:ring-0 text-sm w-full"
+                                placeholder="Search everything..."
+                                className="bg-transparent border-none focus:ring-0 w-full font-bold placeholder:text-gray-300"
                             />
                         </div>
-                        <div className="w-px h-8 bg-border-main mx-4" />
                     </div>
 
                     <div className="flex items-center gap-6 h-full">
                         <LanguageToggle />
-                        <div className="w-px h-8 bg-border-main" />
-                        <button className="text-gray-400 hover:text-gray-600">
+                        <div className="w-px h-6 bg-border-main" />
+                        <button className="text-gray-400 hover:text-primary transition-premium relative">
                             <Bell size={20} />
+                            <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full border-2 border-surface" />
                         </button>
-                        <div className="w-px h-8 bg-border-main" />
-                        <button className="flex items-center gap-3 text-gray-700 hover:text-gray-900 group">
-                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center border border-border-main">
-                                <User size={18} className="text-gray-500" />
+                        <div className="w-px h-6 bg-border-main" />
+                        <button className="flex items-center gap-4 text-gray-700 hover:text-gray-900 group transition-premium">
+                            <div className="text-right">
+                                <span className="text-[11px] font-black text-gray-900 block leading-none uppercase tracking-widest">Admin</span>
+                                <span className="text-[10px] text-gray-400 font-bold block mt-1">Super User</span>
                             </div>
-                            <span className="text-sm font-semibold">Admin User</span>
+                            <div className="w-10 h-10 bg-primary/5 rounded-hr flex items-center justify-center border border-primary/20 overflow-hidden transition-premium group-hover:scale-105 group-hover:shadow-hr-md">
+                                <User size={20} className="text-primary" />
+                            </div>
                         </button>
                     </div>
                 </header>

@@ -5,6 +5,7 @@ import React from 'react';
 interface HRBadgeProps {
     children: React.ReactNode;
     variant?: 'success' | 'warning' | 'error' | 'info';
+    className?: string;
 }
 
 const styles = {
@@ -14,9 +15,9 @@ const styles = {
     info: 'bg-[#EFF6FF] text-[#007AFF] border-[#BFDBFE]',
 };
 
-export default function HRBadge({ children, variant = 'info' }: HRBadgeProps) {
+export default function HRBadge({ children, variant = 'info', className = '' }: HRBadgeProps) {
     return (
-        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-colors ${styles[variant]}`}>
+        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-colors ${styles[variant]} ${className}`}>
             {children}
         </span>
     );

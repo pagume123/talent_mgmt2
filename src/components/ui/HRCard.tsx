@@ -10,7 +10,7 @@ interface HRCardProps {
 
 export default function HRCard({ children, className = '', padding = true }: HRCardProps) {
     return (
-        <div className={`bg-surface border border-border-main rounded-[6px] ${padding ? 'p-6' : ''} ${className}`}>
+        <div className={`bg-surface border border-border-main rounded-hr transition-premium ${padding ? 'p-6' : ''} shadow-hr-sm hover:shadow-hr-md ${className}`}>
             {children}
         </div>
     );
