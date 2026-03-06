@@ -61,7 +61,9 @@ export default function EmployeesPage() {
                 setFormData({ full_name: '', email: '', role: 'employee' });
                 fetchEmployees();
             } else {
-                setError(data.error);
+                const errorMsg = data.error || 'Failed to add employee';
+                const detailMsg = data.details?.message || data.details?.hint || '';
+                setError(`${errorMsg}${detailMsg ? `: ${detailMsg}` : ''}`);
             }
         } catch (err: any) {
             setError(err.message);

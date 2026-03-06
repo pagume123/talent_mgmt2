@@ -33,12 +33,15 @@ export async function middleware(request: NextRequest) {
 
     // Public routes — always allow
     const publicRoutes = ['/', '/auth/login', '/auth/callback']
-    if (publicRoutes.some(r => pathname === r) || pathname.startsWith('/tma')) {
+    if (publicRoutes.some(r => pathname === r) || pathname.startsWith('/tma') || pathname.startsWith('/api/tma') || pathname.startsWith('/api/auth/tma')) {
         return supabaseResponse
     }
 
     // Not logged in → send to login
     if (!user) {
+        // Exclude /api routes from redirection to avoid 405s, just let them return 401
+        if (pathname.startsWith('/api')) return supabaseResponse;
+
         const url = request.nextUrl.clone()
         url.pathname = '/auth/login'
         return NextResponse.redirect(url)
@@ -54,7 +57,7 @@ export async function middleware(request: NextRequest) {
         const { data: profile } = await supabase
             .from('profiles')
             .select('company_id, role')
-            .eq('id', user.id)
+            .eq('user_id', user.id)
             .single()
 
         if (!profile?.company_id) {

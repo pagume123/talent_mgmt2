@@ -40,7 +40,8 @@ export async function POST(req: Request) {
             .single();
 
         if (profileError) {
-            return NextResponse.json({ error: profileError.message }, { status: 500 });
+            console.error('Profile creation error:', profileError);
+            return NextResponse.json({ error: profileError.message, details: profileError }, { status: 500 });
         }
 
         // 2. Create the invitation token
@@ -54,9 +55,10 @@ export async function POST(req: Request) {
             });
 
         if (inviteError) {
+            console.error('Invite creation error:', inviteError);
             // Cleanup profile if invite fails
             await supabase.from('profiles').delete().eq('id', profile.id);
-            return NextResponse.json({ error: inviteError.message }, { status: 500 });
+            return NextResponse.json({ error: inviteError.message, details: inviteError }, { status: 500 });
         }
 
         return NextResponse.json({
@@ -66,7 +68,8 @@ export async function POST(req: Request) {
         });
 
     } catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        console.error('Fatal API Error:', err);
+        return NextResponse.json({ error: err.message, stack: err.stack }, { status: 500 });
     }
 }
 

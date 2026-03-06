@@ -14,7 +14,7 @@ export default async function OnboardingPage() {
     const { data: profile } = await supabase
         .from('profiles')
         .select('company_id')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single();
 
     if (profile?.company_id) redirect('/dashboard');
