@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #F0F2F5;
+  --color-surface: #FFFFFF;
+  --color-border-main: #E2E8F0;
+  --color-primary: #007AFF;
+  --color-secondary: #F9FAFB;
+  --color-header-row: #F8FAFC;
+  --color-tint-blue: #EFF6FF;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-amharic: var(--font-noto-ethiopic), sans-serif;
+
+  --radius-hr: 6px;
+}
+
+:root {
+  --background: #F0F2F5;
+  --foreground: #111827;
+  --primary: #007AFF;
+  --border: #E2E8F0;
+}
+
+* {
+  box-shadow: none !important;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .hr-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-main);
+    border-radius: var(--radius-hr);
+    padding: 24px;
+  }
+
+  .hr-input {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-main);
+    border-radius: var(--radius-hr);
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: border-color 150ms ease;
+  }
+
+  .hr-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  /* Font classes */
+  .font-sans {
+    font-family: var(--font-sans) !important;
+  }
+
+  .font-amharic {
+    font-family: var(--font-amharic) !important;
+  }
+}
+
+@layer utilities {
+  .tma-fade-in {
+    animation: fadeIn 150ms ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
