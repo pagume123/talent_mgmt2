@@ -1,6 +1,7 @@
 'use client';
 
 import { useTMA } from "@/components/tma/TMAProvider";
+import TMAClaimScreen from "@/components/tma/TMAClaimScreen"; // Added this import
 import HRCard from "@/components/ui/HRCard";
 import HRBadge from "@/components/ui/HRBadge";
 import BilingualText from "@/components/common/BilingualText";
@@ -9,7 +10,7 @@ import Link from "next/link";
 import { ARCHETYPE_PROFILES } from "@/lib/utils/archetypes";
 
 export default function TMAHome() {
-    const { user, profile, company, isLoading, error, registered } = useTMA();
+    const { user, profile, company, isLoading, error, registered, refresh } = useTMA(); // Added 'refresh' to destructuring
 
     if (isLoading) {
         return (
@@ -24,30 +25,7 @@ export default function TMAHome() {
 
     // Employee not yet linked
     if (!registered) {
-        return (
-            <div className="p-6 space-y-4 mt-4">
-                <HRCard>
-                    <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 bg-[#FEF3C7] border border-[#FDE68A] rounded-[6px] flex items-center justify-center shrink-0">
-                            <AlertCircle size={18} className="text-[#92400E]" />
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-gray-900 text-sm">Account not linked</h3>
-                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                                {error ?? 'Your Telegram account is not yet connected to an HR workspace. Please contact your HR Admin.'}
-                            </p>
-                        </div>
-                    </div>
-                </HRCard>
-                {user && (
-                    <HRCard>
-                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Your Telegram Account</div>
-                        <div className="font-semibold text-gray-900">{user.first_name} {user.last_name ?? ''}</div>
-                        <div className="text-xs text-gray-400 mt-0.5">ID: {user.id}</div>
-                    </HRCard>
-                )}
-            </div>
-        );
+        return <TMAClaimScreen user={user} refresh={refresh} error={error} />;
     }
 
     const archetype = company?.archetype;
@@ -131,6 +109,18 @@ export default function TMAHome() {
                                 <BilingualText en="Submit a Request" am="ጥያቄ አቅርብ" />
                             </div>
                             <div className="text-[10px] text-gray-400">Leave, expense, other</div>
+                        </div>
+                        <span className="text-gray-400 group-hover:text-gray-600">→</span>
+                    </Link>
+                    <Link href="/tma/perks" className="flex items-center gap-3 p-4 hover:bg-secondary transition-colors group">
+                        <div className="w-8 h-8 bg-secondary rounded-[6px] flex items-center justify-center border border-border-main">
+                            <Building2 size={16} className="text-gray-500" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-sm font-semibold text-gray-900">
+                                <BilingualText en="Perks & Benefits" am="ጥቅማ ጥቅሞች" />
+                            </div>
+                            <div className="text-[10px] text-gray-400">View what's available to you</div>
                         </div>
                         <span className="text-gray-400 group-hover:text-gray-600">→</span>
                     </Link>

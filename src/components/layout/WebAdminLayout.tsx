@@ -17,12 +17,12 @@ import {
 import LanguageToggle from '@/components/common/LanguageToggle';
 
 const NAV_ITEMS = [
-    { label: 'Dashboard', icon: LayoutDashboard, path: '/' },
-    { label: 'Policies', icon: FileText, path: '/policies/new' }, // Simplified for demo
+    { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+    { label: 'Policies', icon: FileText, path: '/policies/new' },
     { label: 'Requests', icon: ClipboardList, path: '/manager/requests' },
-    { label: 'Employees', icon: Users, path: '#' },
-    { label: 'Perks', icon: Gift, path: '#' },
-    { label: 'Settings', icon: Settings, path: '#' },
+    { label: 'Employees', icon: Users, path: '/dashboard/employees' },
+    { label: 'Perks', icon: Gift, path: '/dashboard/perks' },
+    { label: 'Settings', icon: Settings, path: '/settings' },
 ];
 
 export default function WebAdminLayout({ children }: { children: React.ReactNode }) {
@@ -46,8 +46,8 @@ export default function WebAdminLayout({ children }: { children: React.ReactNode
                                 key={item.label}
                                 href={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-[6px] text-sm font-medium transition-all ${isActive
-                                        ? 'bg-tint-blue text-primary border border-primary/20'
-                                        : 'text-gray-500 hover:bg-secondary hover:text-gray-900 border border-transparent'
+                                    ? 'bg-tint-blue text-primary border border-primary/20'
+                                    : 'text-gray-500 hover:bg-secondary hover:text-gray-900 border border-transparent'
                                     }`}
                             >
                                 <Icon size={20} />

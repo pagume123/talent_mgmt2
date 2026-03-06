@@ -30,20 +30,27 @@ interface TMAContextType {
     isLoading: boolean;
     error: string | null;
     registered: boolean;
+    refresh: () => Promise<void>;
 }
 
 const TMAContext = createContext<TMAContextType>({
     user: null, profile: null, company: null,
     isLoading: true, error: null, registered: false,
+    refresh: async () => { },
 });
 
 export function TMAProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState<TMAContextType>({
         user: null, profile: null, company: null,
         isLoading: true, error: null, registered: false,
+        refresh: async () => { },
     });
 
     useEffect(() => {
+        refresh();
+    }, []);
+
+    const refresh = async () => {
         const tg = (window as any).Telegram?.WebApp;
         const telegramUser = tg?.initDataUnsafe?.user ?? null;
         const initData = tg?.initData ?? '';
@@ -57,6 +64,7 @@ export function TMAProvider({ children }: { children: ReactNode }) {
                 isLoading: false,
                 error: null,
                 registered: false,
+                refresh,
             });
             return;
         }
@@ -77,6 +85,7 @@ export function TMAProvider({ children }: { children: ReactNode }) {
                         isLoading: false,
                         error: null,
                         registered: true,
+                        refresh,
                     });
                 } else {
                     setState({
@@ -86,13 +95,14 @@ export function TMAProvider({ children }: { children: ReactNode }) {
                         isLoading: false,
                         error: data.error,
                         registered: false,
+                        refresh,
                     });
                 }
             })
             .catch(err => {
                 setState(prev => ({ ...prev, isLoading: false, error: 'Connection error' }));
             });
-    }, []);
+    };
 
     return <TMAContext.Provider value={state}>{children}</TMAContext.Provider>;
 }

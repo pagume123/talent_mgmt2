@@ -47,12 +47,12 @@ export async function POST(req: Request) {
         const { error: profileError } = await supabase
             .from('profiles')
             .upsert({
-                id: user.id,
+                user_id: user.id,
                 company_id: company.id,
                 role: 'admin',
-                telegram_id: null,
-                supervisor_id: null,
-            });
+                full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
+                email: user.email,
+            }, { onConflict: 'user_id' });
 
         if (profileError) {
             // Rollback: delete company if profile failed

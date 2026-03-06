@@ -7,7 +7,7 @@
 CREATE OR REPLACE FUNCTION get_my_profile() 
 RETURNS TABLE (company_id UUID, role TEXT) AS $$
 BEGIN
-  RETURN QUERY SELECT p.company_id, p.role FROM profiles p WHERE p.id = auth.uid();
+  RETURN QUERY SELECT p.company_id, p.role FROM profiles p WHERE p.user_id = auth.uid();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -22,15 +22,29 @@ CREATE TABLE IF NOT EXISTS companies (
 
 -- 3. Profiles Table
 CREATE TABLE IF NOT EXISTS profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL,
   company_id UUID REFERENCES companies(id),
+  full_name TEXT,
+  email TEXT,
   role TEXT CHECK (role IN ('admin', 'employee', 'supervisor')),
-  telegram_id TEXT,
+  telegram_id TEXT UNIQUE,
   supervisor_id UUID REFERENCES profiles(id),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Policies Table
+-- 4. Invitations Table (For linking TMA accounts)
+CREATE TABLE IF NOT EXISTS invitations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES companies(id),
+  profile_id UUID NOT NULL REFERENCES profiles(id),
+  token TEXT NOT NULL UNIQUE,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'claimed', 'expired')),
+  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '7 days'),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. Policies Table
 CREATE TABLE IF NOT EXISTS policies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES companies(id),
@@ -42,7 +56,7 @@ CREATE TABLE IF NOT EXISTS policies (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. Requests Table
+-- 6. Requests Table
 CREATE TABLE IF NOT EXISTS requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   profile_id UUID NOT NULL REFERENCES profiles(id),
@@ -53,7 +67,7 @@ CREATE TABLE IF NOT EXISTS requests (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 6. Perks Table
+-- 7. Perks Table
 CREATE TABLE IF NOT EXISTS perks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES companies(id),
@@ -99,11 +113,11 @@ CREATE POLICY "companies_update_admin" ON companies
 -- ------------------------------------------
 DROP POLICY IF EXISTS "profiles_insert_own" ON profiles;
 CREATE POLICY "profiles_insert_own" ON profiles
-  FOR INSERT WITH CHECK (id = auth.uid());
+  FOR INSERT WITH CHECK (user_id = auth.uid());
 
 DROP POLICY IF EXISTS "profiles_select_own" ON profiles;
 CREATE POLICY "profiles_select_own" ON profiles
-  FOR SELECT USING (id = auth.uid());
+  FOR SELECT USING (user_id = auth.uid());
 
 DROP POLICY IF EXISTS "profiles_select_company" ON profiles;
 CREATE POLICY "profiles_select_company" ON profiles
@@ -183,3 +197,20 @@ CREATE POLICY "perks_all_admin" ON perks
     (SELECT p.role FROM get_my_profile() p) = 'admin' AND
     company_id = (SELECT p.company_id FROM get_my_profile() p)
   );
+
+-- ------------------------------------------
+-- INVITATIONS
+-- ------------------------------------------
+ALTER TABLE invitations ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "invitations_all_admin" ON invitations;
+CREATE POLICY "invitations_all_admin" ON invitations
+  FOR ALL USING (
+    (SELECT p.role FROM get_my_profile() p) = 'admin' AND
+    company_id = (SELECT p.company_id FROM get_my_profile() p)
+  );
+
+-- Allow public lookup of pending tokens (used by TMA to start claim process)
+DROP POLICY IF EXISTS "invitations_select_public" ON invitations;
+CREATE POLICY "invitations_select_public" ON invitations
+  FOR SELECT USING (status = 'pending');

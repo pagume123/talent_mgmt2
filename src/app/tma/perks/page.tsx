@@ -2,35 +2,25 @@
 
 import PerkCard from "@/components/tma/PerkCard";
 import { Perk } from "@/lib/types";
-
-const MOCK_PERKS: Perk[] = [
-    {
-        id: '1',
-        company_id: 'any',
-        title: 'Transport Allowance',
-        description: 'Monthly stipend covering commute costs to and from the HR main office.',
-        value: '5,000 ETB',
-        created_at: new Date().toISOString(),
-    },
-    {
-        id: '2',
-        company_id: 'any',
-        title: 'Health Insurance',
-        description: 'Comprehensive medical coverage for you and up to 2 dependents.',
-        value: 'Premium',
-        created_at: new Date().toISOString(),
-    },
-    {
-        id: '3',
-        company_id: 'any',
-        title: 'Skill Development',
-        description: 'Annual budget for online courses, certifications, and technical books.',
-        value: 'Education',
-        created_at: new Date().toISOString(),
-    }
-];
+import { useTMA } from "@/components/tma/TMAProvider";
+import { useState, useEffect } from "react";
 
 export default function TMAPerks() {
+    const { company } = useTMA();
+    const [perks, setPerks] = useState<Perk[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!company?.id) { setLoading(false); return; }
+        fetch(`/api/perks?company_id=${company.id}`)
+            .then(res => res.json())
+            .then(data => {
+                setPerks(data.perks ?? []);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, [company?.id]);
+
     return (
         <div className="p-6 space-y-8">
             <header>
@@ -41,9 +31,19 @@ export default function TMAPerks() {
             </header>
 
             <div className="space-y-4 pb-12">
-                {MOCK_PERKS.map(perk => (
-                    <PerkCard key={perk.id} perk={perk} />
-                ))}
+                {loading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="h-24 bg-surface border border-border-main rounded-2xl animate-pulse" />
+                    ))
+                ) : perks.length === 0 ? (
+                    <div className="text-center py-12 text-sm text-gray-400 italic font-medium">
+                        No perks available yet.
+                    </div>
+                ) : (
+                    perks.map(perk => (
+                        <PerkCard key={perk.id} perk={perk} />
+                    ))
+                )}
             </div>
         </div>
     );

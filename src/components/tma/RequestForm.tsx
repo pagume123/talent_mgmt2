@@ -19,6 +19,9 @@ export default function RequestForm({ onSuccess }: { onSuccess: () => void }) {
 
         setIsSubmitting(true);
         try {
+            const tg = (window as any).Telegram?.WebApp;
+            const initData = tg?.initData || '';
+
             const res = await fetch('/api/requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -26,6 +29,7 @@ export default function RequestForm({ onSuccess }: { onSuccess: () => void }) {
                     type,
                     details: { startDate, endDate, reason },
                     telegramId: user?.id,
+                    initData
                 }),
             });
 

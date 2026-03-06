@@ -1,50 +1,65 @@
 'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WebAdminLayout from '@/components/layout/WebAdminLayout';
 import HRTable from '@/components/ui/HRTable';
 import HRBadge from '@/components/ui/HRBadge';
 import HRCard from '@/components/ui/HRCard';
 import { RequestStatus } from '@/lib/types';
-
-const MOCK_REQUESTS = [
-    {
-        id: 'req_1',
-        profile: { first_name: 'Abeba', last_name: 'Kassa' },
-        type: 'leave',
-        status: 'pending' as RequestStatus,
-        details: { startDate: '2024-03-10', endDate: '2024-03-15', reason: 'Family visit in Bahir Dar' }
-    },
-    {
-        id: 'req_2',
-        profile: { first_name: 'Dawit', last_name: 'Mulugeta' },
-        type: 'leave',
-        status: 'approved' as RequestStatus,
-        details: { startDate: '2024-03-05', endDate: '2024-03-06', reason: 'Medical checkup' }
-    }
-];
+import { Loader2 } from 'lucide-react';
 
 export default function ManagerRequestsPage() {
-    const [requests, setRequests] = useState(MOCK_REQUESTS);
+    const [requests, setRequests] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        fetchRequests();
+    }, []);
+
+    const fetchRequests = async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/requests');
+            const data = await res.json();
+            if (data.requests) setRequests(data.requests);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleAction = async (id: string, status: RequestStatus) => {
-        setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+        try {
+            const res = await fetch('/api/requests', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status }),
+            });
+            if (res.ok) {
+                setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+            }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const headers = ['Employee', 'Type', 'Dates', 'Status', 'Actions'];
     const rows = requests.map((req, idx) => [
         <div className="flex items-center gap-3" key={`emp-${idx}`}>
-            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-[10px] font-black border border-border-main text-gray-700">
-                {req.profile.first_name[0]}
+            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-[10px] font-black border border-border-main text-gray-700 uppercase">
+                {req.profiles?.full_name?.[0] || 'U'}
             </div>
-            <span className="font-semibold text-gray-900">{req.profile.first_name} {req.profile.last_name}</span>
+            <span className="font-semibold text-gray-900">{req.profiles?.full_name || 'Unknown User'}</span>
         </div>,
         <span className="font-semibold uppercase tracking-wider text-[11px] text-gray-500" key={`type-${idx}`}>{req.type}</span>,
         <div key={`dates-${idx}`}>
-            <div className="font-medium text-gray-700">{new Date(req.details.startDate).toLocaleDateString()} - {new Date(req.details.endDate).toLocaleDateString()}</div>
-            <div className="text-[10px] text-gray-400 italic mt-0.5 line-clamp-1">"{req.details.reason}"</div>
+            <div className="font-medium text-gray-700">
+                {req.details?.startDate ? new Date(req.details.startDate).toLocaleDateString() : 'N/A'} -
+                {req.details?.endDate ? new Date(req.details.endDate).toLocaleDateString() : 'N/A'}
+            </div>
+            <div className="text-[10px] text-gray-400 italic mt-0.5 line-clamp-1">"{req.details?.reason || 'No reason'}"</div>
         </div>,
-        <HRBadge variant={req.status === 'approved' ? 'success' : req.status === 'denied' ? 'error' : 'warning'} key={`status-${idx}`}>
+        <HRBadge variant={req.status === 'approved' ? 'success' : req.status === 'denied' ? 'error' : 'info'} key={`status-${idx}`}>
             {req.status}
         </HRBadge>,
         <div className="flex justify-end gap-4" key={`actions-${idx}`}>
@@ -67,14 +82,27 @@ export default function ManagerRequestsPage() {
                     </div>
                     <div className="flex gap-4">
                         <HRCard className="flex items-center gap-4 py-3 px-6" padding={false}>
-                            <span className="text-2xl font-bold text-primary">1</span>
+                            <span className="text-2xl font-bold text-primary">
+                                {requests.filter(r => r.status === 'pending').length}
+                            </span>
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pending</span>
                         </HRCard>
                     </div>
                 </header>
 
                 <section>
-                    <HRTable headers={headers} rows={rows} />
+                    {isLoading ? (
+                        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                            <Loader2 className="animate-spin mb-4" size={32} />
+                            <p className="text-sm font-medium">Loading requests...</p>
+                        </div>
+                    ) : requests.length === 0 ? (
+                        <div className="text-center py-20 bg-secondary/30 rounded-3xl border border-dashed border-border-main text-gray-400 italic font-medium">
+                            No requests submitted yet.
+                        </div>
+                    ) : (
+                        <HRTable headers={headers} rows={rows} />
+                    )}
                 </section>
             </div>
         </WebAdminLayout>
