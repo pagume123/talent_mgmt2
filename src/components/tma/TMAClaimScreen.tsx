@@ -15,6 +15,23 @@ export default function TMAClaimScreen({ user, refresh, error }: TMAClaimScreenP
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [localError, setLocalError] = useState<string | null>(null);
 
+    if (error === 'not_in_telegram') {
+        return (
+            <div className="p-6 space-y-6 mt-10 animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col items-center justify-center text-center min-h-[60vh]">
+                <div className="w-16 h-16 bg-red-50 border border-red-100 rounded-2xl flex items-center justify-center text-red-500 mb-2">
+                    <ShieldCheck size={32} />
+                </div>
+                <h1 className="text-2xl font-black text-gray-900 tracking-tight">Access Restricted</h1>
+                <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
+                    This portal is designed exclusively for employees via the Telegram Mini App.
+                </p>
+                <div className="bg-[#EFF6FF] border border-[#BFDBFE] p-4 rounded-xl text-xs font-bold text-primary w-full max-w-xs mt-8 whitespace-pre-wrap">
+                    Please open the HR Bot inside Telegram to access your workplace profile.
+                </div>
+            </div>
+        );
+    }
+
     const handleClaim = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!token) return;

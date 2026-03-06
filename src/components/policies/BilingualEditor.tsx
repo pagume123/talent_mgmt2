@@ -48,11 +48,30 @@ export default function BilingualEditor({
 
     const handleSave = async () => {
         setIsSaving(true);
-        // Here we would save to Supabase
-        // Simulating save
-        await new Promise(r => setTimeout(r, 1000));
-        alert("Policy saved successfully (Simulation)");
-        router.push('/');
+        try {
+            const res = await fetch('/api/policies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title_en: title,
+                    title_am: title, // Simplified for MVP
+                    content_en: contentEn,
+                    content_am: contentAm
+                }),
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Failed to save policy');
+            }
+
+            router.push('/dashboard');
+        } catch (error: any) {
+            console.error(error);
+            alert(error.message || "Failed to save policy");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (

@@ -25,3 +25,43 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+
+export async function POST(req: Request) {
+    try {
+        const supabase = await createClient();
+        if (!supabase) return NextResponse.json({ error: 'Database error' }, { status: 500 });
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const { data: profile } = await supabase
+            .from('get_my_profile()')
+            .select('*')
+            .single();
+
+        if (profile?.role !== 'admin') {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
+        const { title_en, title_am, content_en, content_am } = await req.json();
+
+        const { data, error } = await supabase
+            .from('policies')
+            .insert({
+                company_id: profile.company_id,
+                title_en,
+                title_am,
+                content_en,
+                content_am,
+                status: 'published'
+            })
+            .select()
+            .single();
+
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+        return NextResponse.json({ success: true, policy: data });
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}

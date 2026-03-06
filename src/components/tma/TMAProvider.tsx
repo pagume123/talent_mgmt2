@@ -56,13 +56,13 @@ export function TMAProvider({ children }: { children: ReactNode }) {
         const initData = tg?.initData ?? '';
 
         if (!telegramUser) {
-            // DEV MODE: use mock user for local testing
+            // Restrict access to Telegram Mini App only
             setState({
-                user: { id: 999999, first_name: 'Demo', last_name: 'Employee' },
+                user: null,
                 profile: null,
                 company: null,
                 isLoading: false,
-                error: null,
+                error: 'not_in_telegram',
                 registered: false,
                 refresh,
             });
