@@ -1,0 +1,222 @@
+2026-03-06T14:27:13.755Z: {
+  "event": "Incoming Request",
+  "telegram_id": "407917329",
+  "message": "can we have a short meeting please?\n"
+}
+2026-03-06T14:27:13.757Z: {
+  "event": "Sending to Telegram",
+  "payload": {
+    "chat_id": "407917329",
+    "text": "can we have a short meeting please?\n"
+  }
+}
+2026-03-06T14:27:14.121Z: {
+  "event": "Telegram Response",
+  "status": 401,
+  "result": {
+    "ok": false,
+    "error_code": 401,
+    "description": "Unauthorized"
+  }
+}
+2026-03-06T14:28:57.777Z: {
+  "event": "Incoming Request",
+  "telegram_id": "407917329",
+  "message": "can we have a short meeting please?\n"
+}
+2026-03-06T14:28:57.779Z: {
+  "event": "Sending to Telegram",
+  "payload": {
+    "chat_id": "407917329",
+    "text": "can we have a short meeting please?\n"
+  }
+}
+2026-03-06T14:28:58.120Z: {
+  "event": "Telegram Response",
+  "status": 401,
+  "result": {
+    "ok": false,
+    "error_code": 401,
+    "description": "Unauthorized"
+  }
+}
+2026-03-06T14:32:10.037Z: {
+  "event": "Incoming Request",
+  "telegram_id": "407917329",
+  "message": "can we have a short meeting please?\n"
+}
+2026-03-06T14:32:10.038Z: {
+  "event": "Sanitized Token",
+  "prefix": "8747474214:AAGg..."
+}
+2026-03-06T14:32:10.039Z: {
+  "event": "Sending to Telegram",
+  "payload": {
+    "chat_id": "407917329",
+    "text": "can we have a short meeting please?\n"
+  }
+}
+2026-03-06T14:32:10.388Z: {
+  "event": "Telegram Response",
+  "status": 401,
+  "result": {
+    "ok": false,
+    "error_code": 401,
+    "description": "Unauthorized"
+  }
+}
+2026-03-06T14:32:22.193Z: {
+  "event": "Incoming Request",
+  "telegram_id": "407917329",
+  "message": "can we have a short meeting please?\n"
+}
+2026-03-06T14:32:22.194Z: {
+  "event": "Sanitized Token",
+  "prefix": "8747474214:AAGg..."
+}
+2026-03-06T14:32:22.195Z: {
+  "event": "Sending to Telegram",
+  "payload": {
+    "chat_id": "407917329",
+    "text": "can we have a short meeting please?\n"
+  }
+}
+2026-03-06T14:32:22.531Z: {
+  "event": "Telegram Response",
+  "status": 401,
+  "result": {
+    "ok": false,
+    "error_code": 401,
+    "description": "Unauthorized"
+  }
+}
+2026-03-06T14:33:35.667Z: {
+  "event": "Incoming Request",
+  "telegram_id": "407917329",
+  "message": "can we have a short meeting please?\n"
+}
+2026-03-06T14:33:35.668Z: {
+  "event": "Sanitized Token",
+  "prefix": "8747474214:AAGg..."
+}
+2026-03-06T14:33:35.668Z: {
+  "event": "Sending to Telegram",
+  "payload": {
+    "chat_id": "407917329",
+    "text": "can we have a short meeting please?\n"
+  }
+}
+2026-03-06T14:33:36.031Z: {
+  "event": "Telegram Response",
+  "status": 401,
+  "result": {
+    "ok": false,
+    "error_code": 401,
+    "description": "Unauthorized"
+  }
+}
+2026-03-06T14:34:00.201Z: {
+  "event": "Incoming Request",
+  "telegram_id": "1274985106",
+  "message": "can we have a short meeting please?\n"
+}
+2026-03-06T14:34:00.202Z: {
+  "event": "Sanitized Token",
+  "prefix": "8747474214:AAGg..."
+}
+2026-03-06T14:34:00.202Z: {
+  "event": "Sending to Telegram",
+  "payload": {
+    "chat_id": "1274985106",
+    "text": "can we have a short meeting please?\n"
+  }
+}
+2026-03-06T14:34:01.965Z: {
+  "event": "Telegram Response",
+  "status": 401,
+  "result": {
+    "ok": false,
+    "error_code": 401,
+    "description": "Unauthorized"
+  }
+}
+2026-03-06T14:36:14.233Z: {
+  "event": "Incoming Request",
+  "telegram_id": "407917329",
+  "message": "can we have a short meeting please?\n"
+}
+2026-03-06T14:36:14.234Z: {
+  "event": "Sanitized Token",
+  "prefix": "8738464486:AAES..."
+}
+2026-03-06T14:36:14.235Z: {
+  "event": "Sending to Telegram",
+  "payload": {
+    "chat_id": "407917329",
+    "text": "can we have a short meeting please?\n"
+  }
+}
+2026-03-06T14:36:18.033Z: {
+  "event": "Telegram Response",
+  "status": 200,
+  "result": {
+    "ok": true,
+    "result": {
+      "message_id": 5,
+      "from": {
+        "id": 8738464486,
+        "is_bot": true,
+        "first_name": "Talentbot",
+        "username": "Talent_mainbot"
+      },
+      "chat": {
+        "id": 407917329,
+        "first_name": "Nahu",
+        "username": "Nahu0S",
+        "type": "private"
+      },
+      "date": 1772807779,
+      "text": "can we have a short meeting please?"
+    }
+  }
+}
+2026-03-06T14:36:41.876Z: {
+  "event": "Incoming Request",
+  "telegram_id": "1274985106",
+  "message": "Can we have a short meeting?\n"
+}
+2026-03-06T14:36:41.877Z: {
+  "event": "Sanitized Token",
+  "prefix": "8738464486:AAES..."
+}
+2026-03-06T14:36:41.878Z: {
+  "event": "Sending to Telegram",
+  "payload": {
+    "chat_id": "1274985106",
+    "text": "Can we have a short meeting?\n"
+  }
+}
+2026-03-06T14:36:42.280Z: {
+  "event": "Telegram Response",
+  "status": 200,
+  "result": {
+    "ok": true,
+    "result": {
+      "message_id": 6,
+      "from": {
+        "id": 8738464486,
+        "is_bot": true,
+        "first_name": "Talentbot",
+        "username": "Talent_mainbot"
+      },
+      "chat": {
+        "id": 1274985106,
+        "first_name": "Yeabsira",
+        "username": "yeabsira124",
+        "type": "private"
+      },
+      "date": 1772807803,
+      "text": "Can we have a short meeting?"
+    }
+  }
+}
