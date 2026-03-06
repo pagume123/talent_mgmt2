@@ -70,3 +70,45 @@ export async function POST(req: Request) {
         }, { status: 500 });
     }
 }
+
+export async function PATCH(req: Request) {
+    try {
+        const supabase = await createClient();
+        if (!supabase) return NextResponse.json({ error: 'Database error' }, { status: 500 });
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const { name, metadata } = await req.json();
+
+        // Get admin context to verify ownership and get company_id
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('company_id, role')
+            .eq('user_id', user.id)
+            .single();
+
+        if (profile?.role !== 'admin' || !profile.company_id) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
+        // Update company
+        const { data: company, error } = await supabase
+            .from('companies')
+            .update({
+                name,
+                // Partial update of settings JSON if needed, or just specific fields
+                // For now, let's keep it simple: update name and top-level fields
+            })
+            .eq('id', profile.company_id)
+            .select()
+            .single();
+
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+        return NextResponse.json({ success: true, company });
+
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}

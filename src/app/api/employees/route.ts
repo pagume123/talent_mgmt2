@@ -110,3 +110,70 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const supabase = await createClient();
+        if (!supabase) return NextResponse.json({ error: 'Database error' }, { status: 500 });
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const { searchParams } = new URL(req.url);
+        const employeeId = searchParams.get('id');
+
+        if (!employeeId) {
+            return NextResponse.json({ error: 'Employee ID is required' }, { status: 400 });
+        }
+
+        // Get admin context
+        const { data: adminProfile } = await supabase
+            .from('profiles')
+            .select('company_id, role')
+            .eq('user_id', user.id)
+            .single();
+
+        if (adminProfile?.role !== 'admin') {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
+        // 1. Fetch the profile to check if it's linked
+        const { data: profile, error: fetchError } = await supabase
+            .from('profiles')
+            .select('telegram_id, company_id')
+            .eq('id', employeeId)
+            .single();
+
+        if (fetchError || !profile) {
+            return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
+        }
+
+        // Security check: ensure same company
+        if (profile.company_id !== adminProfile.company_id) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
+        // 2. Prevent deleting linked employees (safety)
+        if (profile.telegram_id) {
+            return NextResponse.json({ error: 'Cannot delete linked employees. Remove them through management instead.' }, { status: 400 });
+        }
+
+        // 3. Delete invitations first (FK constraint)
+        await supabase.from('invitations').delete().eq('profile_id', employeeId);
+
+        // 4. Delete the profile
+        const { error: deleteError } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', employeeId);
+
+        if (deleteError) {
+            return NextResponse.json({ error: deleteError.message }, { status: 500 });
+        }
+
+        return NextResponse.json({ success: true });
+
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}

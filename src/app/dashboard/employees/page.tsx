@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import WebAdminLayout from '@/components/layout/WebAdminLayout';
 import HRCard from '@/components/ui/HRCard';
 import HRBadge from '@/components/ui/HRBadge';
-import { Users, Plus, UserPlus, Copy, CheckCircle, Search, Mail } from 'lucide-react';
+import { Users, Plus, UserPlus, Copy, CheckCircle, Search, Mail, Trash2 } from 'lucide-react';
 
 interface Employee {
     id: string;
@@ -76,6 +76,23 @@ export default function EmployeesPage() {
         navigator.clipboard.writeText(token);
         setCopySuccess(token);
         setTimeout(() => setCopySuccess(null), 2000);
+    };
+
+    const handleDeleteEmployee = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this invitation? This cannot be undone.')) return;
+
+        try {
+            const res = await fetch(`/api/employees?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchEmployees();
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to delete employee');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('An error occurred');
+        }
     };
 
     const filteredEmployees = employees.filter(emp =>
@@ -191,17 +208,28 @@ export default function EmployeesPage() {
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                {!isLinked && pendingInvite && (
-                                                    <div className="inline-flex items-center gap-2 bg-white border border-border-main rounded-md p-1 pl-3">
-                                                        <code className="text-[10px] font-black tracking-widest text-primary">{pendingInvite.token}</code>
+                                                <div className="flex items-center justify-end gap-3">
+                                                    {!isLinked && pendingInvite && (
+                                                        <div className="inline-flex items-center gap-2 bg-white border border-border-main rounded-md p-1 pl-3 shadow-hr-sm">
+                                                            <code className="text-[10px] font-black tracking-widest text-primary">{pendingInvite.token}</code>
+                                                            <button
+                                                                onClick={() => handleCopyToken(pendingInvite.token)}
+                                                                className={`p-1.5 rounded-[4px] transition-premium ${copySuccess === pendingInvite.token ? 'bg-green-50 text-green-600' : 'hover:bg-secondary text-gray-400'}`}
+                                                            >
+                                                                {copySuccess === pendingInvite.token ? <CheckCircle size={14} /> : <Copy size={14} />}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                    {!isLinked && (
                                                         <button
-                                                            onClick={() => handleCopyToken(pendingInvite.token)}
-                                                            className={`p-1.5 rounded-[4px] transition-colors ${copySuccess === pendingInvite.token ? 'bg-green-50 text-green-600' : 'hover:bg-secondary text-gray-400'}`}
+                                                            onClick={() => handleDeleteEmployee(emp.id)}
+                                                            className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-hr transition-premium"
+                                                            title="Delete Invite"
                                                         >
-                                                            {copySuccess === pendingInvite.token ? <CheckCircle size={14} /> : <Copy size={14} />}
+                                                            <Trash2 size={16} />
                                                         </button>
-                                                    </div>
-                                                )}
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     );
